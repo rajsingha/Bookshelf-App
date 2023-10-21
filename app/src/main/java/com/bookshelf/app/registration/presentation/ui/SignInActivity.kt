@@ -73,10 +73,7 @@ class SignInActivity : AppCompatActivity() {
 
     private fun setOnClickListeners() {
         binding.etUserEmail.doAfterTextChanged {
-            if (isMinimum3chars(binding.etUserEmail.text.toString()).not()) {
-                binding.tilUserEmail.error = getString(R.string.please_enter_minimum_3_characters)
-                binding.tilUserEmail.isErrorEnabled = true
-            } else if (validateEmail(binding.etUserEmail.text.toString()).not()) {
+            if (validateEmail(binding.etUserEmail.text.toString()).not()) {
                 binding.tilUserEmail.error = getString(R.string.please_enter_a_valid_email_address)
                 binding.tilUserEmail.isErrorEnabled = true
             } else {
@@ -97,7 +94,7 @@ class SignInActivity : AppCompatActivity() {
         }
 
         binding.tvSignup.clickWithDebounce {
-            startActivity(Intent(this, SignInActivity::class.java))
+            startActivity(Intent(this, SignUpActivity::class.java))
             finish()
         }
 

@@ -1,13 +1,18 @@
 package com.bookshelf.app.registration.presentation.ui
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.bookshelf.app.R
+import com.bookshelf.app.core.utils.clickWithDebounce
+import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
+import com.bookshelf.app.core.utils.showToast
 import com.bookshelf.app.core.utils.validateEmail
 import com.bookshelf.app.core.utils.validatePassword
 import com.bookshelf.app.databinding.ActivitySignUpBinding
+import com.bookshelf.app.registration.data.models.SignupResult
 import com.bookshelf.app.registration.presentation.viewmodels.SignupViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,7 +29,25 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun apiObservers() {
+        collectLatestLifecycleFlow(signupViewModel.signupResult) {
+            when (it) {
+                SignupResult.Failure -> {
+                    showToast("Signup Failed")
+                }
 
+                SignupResult.Success -> {
+                    showToast("Signup Success")
+                }
+
+                SignupResult.UserEmailTaken -> {
+                    showToast("Email taken")
+                }
+            }
+        }
+
+        collectLatestLifecycleFlow(signupViewModel.signUpButtonState) {
+            binding.btnSignUp.isEnabled = it
+        }
     }
 
     override fun onResume() {
@@ -38,8 +61,9 @@ class SignUpActivity : AppCompatActivity() {
                 binding.tilUserName.error = getString(R.string.please_enter_minimum_3_characters)
                 binding.tilUserName.isErrorEnabled = true
             } else {
-                binding.tilUserName.isErrorEnabled = true
+                binding.tilUserName.isErrorEnabled = false
             }
+            isAllFieldsValid()
         }
 
         binding.etUserEmail.doAfterTextChanged {
@@ -49,6 +73,7 @@ class SignUpActivity : AppCompatActivity() {
             } else {
                 binding.tilUserEmail.isErrorEnabled = false
             }
+            isAllFieldsValid()
         }
 
         binding.etPassword.doAfterTextChanged {
@@ -59,6 +84,21 @@ class SignUpActivity : AppCompatActivity() {
             } else {
                 binding.tilPassword.isErrorEnabled = false
             }
+            isAllFieldsValid()
+        }
+
+        binding.tvSignIn.clickWithDebounce {
+            startActivity(Intent(this, SignInActivity::class.java))
+            finish()
+        }
+
+        binding.btnSignUp.clickWithDebounce {
+            signupViewModel.signup(
+                binding.etUserName.text.toString(),
+                binding.etUserEmail.text.toString(),
+                binding.etPassword.text.toString(),
+                country = "India"
+            )
         }
     }
 
