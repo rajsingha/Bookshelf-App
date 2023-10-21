@@ -56,11 +56,11 @@ class SignInActivity : AppCompatActivity() {
         collectLatestLifecycleFlow(sessionManager.sessionObserver()) {
             when (it) {
                 is SessionResult.Active -> {
-
+                    showToast("Session Active")
                 }
 
                 is SessionResult.NotActive -> {
-
+                    showToast("Not Active")
                 }
             }
         }

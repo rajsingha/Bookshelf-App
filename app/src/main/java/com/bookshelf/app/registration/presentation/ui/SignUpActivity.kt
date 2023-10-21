@@ -40,7 +40,7 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 SignupResult.UserEmailTaken -> {
-                    showToast("Email taken")
+                    showToast(getString(R.string.account_already_exist_please_do_sign_in))
                 }
             }
         }
