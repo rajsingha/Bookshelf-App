@@ -12,5 +12,5 @@ class RegistrationUseCase(
 ) {
     suspend fun insertUserCreds(userCredsEntity: UserCredsEntity) = userCredsDao.insertUser(userCredsEntity)
 
-    suspend fun getUserByUsername(userName:String) = userCredsDao.getUserByUsername(userName)
+    suspend fun getUserByUserEmail(userEmail: String) = userCredsDao.getUserByUserEmail(userEmail)
 }

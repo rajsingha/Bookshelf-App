@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -20,11 +21,12 @@ class SessionManager @Inject constructor(private val sessionRepository: SessionR
         CoroutineScope(Dispatchers.IO).launch {
             session.collect {
                 withContext(Dispatchers.Main.immediate){
-                    when{
-                        (it !=null && it.userName.isNotEmpty()) ->{
+                    when {
+                        (it != null && it.email.isNotEmpty()) -> {
                             sessionExpirationChannel.send(SessionResult.Active(it))
                         }
-                        else ->{
+
+                        else -> {
                             sessionExpirationChannel.send(SessionResult.NotActive)
                         }
                     }
@@ -32,9 +34,18 @@ class SessionManager @Inject constructor(private val sessionRepository: SessionR
             }
         }
     }
+
     fun sessionObserver() = sessionExpirationChannel.receiveAsFlow()
 
-    suspend fun clearSession() {
-        sessionRepository.clearSession()
+    fun clearSession() {
+        runBlocking {
+            sessionRepository.clearSession()
+        }
+    }
+
+    fun saveSession(email: String) {
+        runBlocking {
+            sessionRepository.saveSession(email)
+        }
     }
 }

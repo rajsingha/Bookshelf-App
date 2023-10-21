@@ -9,9 +9,8 @@ import javax.inject.Inject
 class SessionRepository @Inject constructor(private val sessionDao: SessionDao) {
     val session: Flow<SessionEntity?> = sessionDao.observeSession()
 
-    suspend fun saveSession(userName: String) {
-        val session = SessionEntity(sessionId = generateSessionId(), userName = userName)
-        sessionDao.insertSession(session)
+    suspend fun saveSession(email: String) {
+        sessionDao.insertSession(SessionEntity(sessionId = generateSessionId(), email = email))
     }
 
     suspend fun clearSession() {

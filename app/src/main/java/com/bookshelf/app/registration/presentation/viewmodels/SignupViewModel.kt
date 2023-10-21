@@ -23,13 +23,16 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
     private val _signupResult = Channel<SignupResult>()
     val signupResult = _signupResult.receiveAsFlow()
 
-    fun signup(username: String, password: String, country: String) {
+    private val _signUpButtonState = Channel<Boolean>()
+    val signUpButtonState = _signUpButtonState.receiveAsFlow()
+
+    fun signup(username: String, email: String, password: String, country: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val existingUser = useCase.getUserByUsername(username)
+            val existingUser = useCase.getUserByUserEmail(email)
             withContext(Dispatchers.Main.immediate) {
                 when {
                     (existingUser != null) -> {
-                        _signupResult.send(SignupResult.UsernameTaken)
+                        _signupResult.send(SignupResult.UserEmailTaken)
                     }
 
                     else -> {
@@ -38,6 +41,7 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
                             useCase.insertUserCreds(
                                 UserCredsEntity(
                                     userName = username,
+                                    email = email,
                                     passwordHash = hashedPassword,
                                     country = country
                                 )
@@ -66,7 +70,6 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
             if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                 networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
             ) {
-
                 val linkProperties = connectivityManager.getLinkProperties(network)
                 linkProperties?.linkAddresses?.forEach {
                     val ip = it.address.hostAddress
@@ -76,7 +79,12 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
                 }
             }
         }
-
         return null
+    }
+
+    fun updateSignUpButtonState(state: Boolean) {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            _signUpButtonState.send(state)
+        }
     }
 }

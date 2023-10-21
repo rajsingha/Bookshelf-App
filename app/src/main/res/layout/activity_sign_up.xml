@@ -48,9 +48,39 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
                     android:fontFamily="sans-serif"
-                    android:text="@string/sign_in_to_continue"
+                    android:text="@string/sign_up_to_continue"
                     android:textColor="@color/black"
                     android:textSize="18sp" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/til_user_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_btn_bordered_light"
+                    android:hint="@string/full_name"
+                    android:padding="5dp"
+                    app:hintTextAppearance="@style/TextAppearance.Design.Hint">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/et_user_name"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:backgroundTint="#0055FF"
+                        android:digits="@string/user_name_digits"
+                        android:gravity="center_vertical"
+                        android:imeOptions="actionNext|flagForceAscii"
+                        android:maxLength="20"
+                        android:maxLines="1"
+                        android:textColorHint="#808080"
+                        android:textSize="16sp"
+                        app:boxStrokeColor="#0055FF"
+                        app:boxStrokeWidth="2dp"
+                        app:hintTextColor="#202020" />
+                </com.google.android.material.textfield.TextInputLayout>
+
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_user_email"
@@ -121,7 +151,7 @@
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="30dp"
                     android:enabled="false"
-                    android:text="@string/sign_in"
+                    android:text="@string/sign_up"
                     android:textColor="@color/white" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -130,7 +160,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="30dp"
                     android:gravity="center"
-                    android:text="@string/new_user_sign_up" />
+                    android:text="@string/already_account_sign_in" />
 
             </LinearLayout>
 

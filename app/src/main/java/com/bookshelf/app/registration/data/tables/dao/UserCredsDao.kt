@@ -10,6 +10,6 @@ interface UserCredsDao {
     @Insert
     suspend fun insertUser(userCredsEntity: UserCredsEntity)
 
-    @Query("SELECT * FROM tbl_user_creds WHERE userName = :username")
-    suspend fun getUserByUsername(username: String): UserCredsEntity?
+    @Query("SELECT * FROM tbl_user WHERE email = :email")
+    suspend fun getUserByUserEmail(email: String): UserCredsEntity?
 }

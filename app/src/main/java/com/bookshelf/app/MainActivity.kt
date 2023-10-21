@@ -1,9 +1,9 @@
 package com.bookshelf.app
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
 import com.bookshelf.app.registration.data.models.SignupResult
 import com.bookshelf.app.registration.presentation.utils.SessionManager
@@ -32,24 +32,24 @@ class MainActivity : AppCompatActivity() {
             when(it){
 
                 SignupResult.Failure -> {
-                    Toast.makeText(this,"Failure",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Failure", Toast.LENGTH_SHORT).show()
 
                 }
+
                 SignupResult.Success -> {
-                    Toast.makeText(this,"Success",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Success", Toast.LENGTH_SHORT).show()
 
 
                 }
-                SignupResult.UsernameTaken -> {
-                    Toast.makeText(this,"Taken",Toast.LENGTH_SHORT).show()
 
-
+                SignupResult.UserEmailTaken -> {
+                    Toast.makeText(this, "Taken", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
 
-        signupViewModel.signup("rajsingha","Raj@4520","India")
+        signupViewModel.signup("rajsingha", "rajsingha@gmail.com", "Raj@4520", "India")
 
     }
 }

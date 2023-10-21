@@ -8,5 +8,5 @@ data class SessionEntity(
     @PrimaryKey
     val id: Long = 0,
     val sessionId: String,
-    val userName: String,
+    val email: String,
 )
