@@ -2,6 +2,7 @@ package com.bookshelf.app.registration.presentation.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.core.widget.doAfterTextChanged
 import com.bookshelf.app.R
@@ -62,7 +63,7 @@ class SignInActivity : BaseActivity() {
                 }
 
                 is SessionResult.NotActive -> {
-                    showToast("Not Active")
+                    Log.e(SignInActivity::class.java.simpleName, "Session Not Active!")
                 }
             }
         }

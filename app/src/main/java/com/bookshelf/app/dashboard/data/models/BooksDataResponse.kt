@@ -12,7 +12,7 @@ data class BooksDataResponseItem(
     @SerializedName("popularity")
     var popularity: Int? = null,
     @SerializedName("publishedChapterDate")
-    var publishedChapterDate: Int? = null,
+    var publishedChapterDate: Long? = null,
     @SerializedName("score")
     var score: Double? = null,
     @SerializedName("title")

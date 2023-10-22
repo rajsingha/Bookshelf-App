@@ -10,7 +10,7 @@ import com.bookshelf.app.dashboard.data.tables.BooksEntity
 @Dao
 interface BooksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertBooks(booksEntity: BooksEntity)
+    suspend fun insertBooks(booksEntity: MutableList<BooksEntity>)
 
     @Query("SELECT * FROM tbl_books_data")
     suspend fun getAllBooks(): MutableList<BooksEntity>?
@@ -21,7 +21,10 @@ interface BooksDao {
     @Query("SELECT * FROM tbl_books_data WHERE isFavourite = 1")
     suspend fun getFavouriteBooks(): MutableList<BooksEntity>?
 
-    @Query("SELECT * FROM tbl_books_data WHERE title LIKE :searchQuery")
+    @Query("SELECT * FROM tbl_books_data WHERE publishedChapterDate = :desiredYear")
+    suspend fun getBooksByYear(desiredYear: Long): MutableList<BooksEntity>?
+
+    @Query("SELECT * FROM tbl_books_data WHERE title LIKE :searchQuery OR publishedChapterDate LIKE :searchQuery")
     fun searchBooksAlike(searchQuery: String): MutableList<BooksEntity>?
 
     @Query("UPDATE tbl_books_data SET isFavourite = 1 WHERE uid = :uid")

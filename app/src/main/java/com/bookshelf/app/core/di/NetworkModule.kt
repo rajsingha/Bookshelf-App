@@ -47,7 +47,6 @@ object NetworkModule {
     @Singleton
     fun provideOkHttpClient(
         loggingInterceptor: HttpLoggingInterceptor,
-        @ApplicationContext context: Context,
         cache: Cache
     ): OkHttpClient {
         val clientBuilder = OkHttpClient.Builder()

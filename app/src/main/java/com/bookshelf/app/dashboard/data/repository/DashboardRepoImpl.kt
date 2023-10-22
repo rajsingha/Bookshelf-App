@@ -15,6 +15,6 @@ class DashboardRepoImpl @Inject constructor(private val dataSource: DashboardDat
         val response =
             safeApiCall { dataSource.getBooksInfo() }
         emit(response)
-    }.applyCommonSideEffects().catch { emit(ErrorHandler.handleException(it as Exception)) }
+    }.applyCommonSideEffects(true).catch { emit(ErrorHandler.handleException(it as Exception)) }
 
 }

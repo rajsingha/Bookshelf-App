@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.bookshelf.app.R
 import com.bookshelf.app.core.utils.clickWithDebounce
 import com.bookshelf.app.dashboard.data.models.Year
 import com.bookshelf.app.databinding.LayoutYearItemBinding
@@ -40,11 +41,27 @@ class YearAdapter(private val onItemSelected: (position: Int, year: Year) -> Uni
         private val onItemSelected: (position: Int, year: Year) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(year: Year, adapter: YearAdapter) {
+            if (year.isActive) {
+                binding.tvYear.setBackgroundColor(context.getColor(R.color.grey))
+            } else {
+                binding.tvYear.setBackgroundColor(context.getColor(R.color.white))
+            }
             binding.tvYear.text = year.year.toString()
             binding.tvYear.clickWithDebounce {
+                adapter.singleSelection(year)
                 onItemSelected.invoke(bindingAdapterPosition, year)
             }
         }
+    }
+
+    private fun singleSelection(year: Year) {
+        years?.forEach {
+            if (it.isActive) {
+                it.isActive = false
+            }
+        }
+        year.isActive = true
+        notifyDataSetChanged()
     }
 
     fun setData(dataList: MutableList<Year>) {

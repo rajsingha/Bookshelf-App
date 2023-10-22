@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:background="@drawable/bg_btn_bordered_light"
-                android:digits="@string/user_name_digits"
+                android:digits="@string/query_digits"
                 android:drawableStart="@drawable/ic_round_search"
                 android:gravity="center_vertical"
                 android:hint="@string/search_book"

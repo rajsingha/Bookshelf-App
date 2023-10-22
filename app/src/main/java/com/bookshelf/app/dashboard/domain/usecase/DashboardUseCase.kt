@@ -14,16 +14,20 @@ class DashboardUseCase(
 
     ) {
     suspend fun getBooksInfoFromApi() = dashboardRepo.getBooksInfo()
-    suspend fun insertBook(booksEntity: BooksEntity) = booksDao.insertBooks(booksEntity)
+
+    suspend fun insertBook(booksEntity: MutableList<BooksEntity>) =
+        booksDao.insertBooks(booksEntity)
 
     suspend fun getBooksRowCount() = booksDao.getBooksRowCount()
 
-    suspend fun searchBook(title: String): MutableList<BooksEntity>? =
-        booksDao.searchBooksAlike("%$title%")
+    suspend fun searchBook(query: String): MutableList<BooksEntity>? =
+        booksDao.searchBooksAlike("%$query%")
 
     suspend fun markBookAsFavourite(uid: String) = booksDao.markBookAsFavourite(uid)
 
     suspend fun unMarkFavouriteBook(uid: String) = booksDao.unMarkFavouriteBook(uid)
+
+    suspend fun filterBooksByYear(date: Long) = booksDao.getBooksByYear(date)
 
     suspend fun getAllBooksFromDB(): MutableList<BooksEntity>? = booksDao.getAllBooks()
 

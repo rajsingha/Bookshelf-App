@@ -110,7 +110,7 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
         }
     }
 
-    fun getCountryListFromDb() {
+    private fun getCountryListFromDb() {
         viewModelScope.launch(Dispatchers.IO) {
             val countryEntity = useCase.getCountriesFromDb()
             withContext(Dispatchers.Main.immediate) {
