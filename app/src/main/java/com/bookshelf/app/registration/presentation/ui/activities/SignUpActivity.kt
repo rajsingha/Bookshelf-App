@@ -62,11 +62,11 @@ class SignUpActivity : BaseActivity() {
         collectLatestLifecycleFlow(signupViewModel.signupResult) {
             when (it) {
                 SignupResult.Failure -> {
-                    showToast("Signup Failed")
+                    showToast(getString(R.string.signup_failed))
                 }
 
                 SignupResult.Success -> {
-                    showToast("Signup Successful, you can Sign In now")
+                    showToast(getString(R.string.signup_successful_you_can_sign_in_now))
                     startActivity(Intent(this, SignInActivity::class.java))
                     finish()
                 }

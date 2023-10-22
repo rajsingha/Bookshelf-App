@@ -18,39 +18,57 @@ fun getBackoffDelay(attempt: Long) = INITIAL_BACKOFF * (attempt + 1)
  * logic across the app.
  */
 
+/**
+ * Apply common side effects to a flow of NetworkResponse for non-paging network requests.
+ * This function handles retries, loading state management, and error handling.
+ *
+ * @return A modified flow with added side effects.
+ */
 fun <T : Any> Flow<NetworkResponse<T>>.applyCommonSideEffects() =
     retryWhen { cause, attempt ->
         when {
+            // Retry when an IOException occurs within the maximum retry limit.
             (cause is IOException && attempt < MAX_RETRIES) -> {
                 delay(getBackoffDelay(attempt))
                 true
             }
 
-            else -> {
-                false
-            }
+            else -> false
         }
-    }.onStart { emit(NetworkResponse.Loading(true)) }
-        .onCompletion { emit(NetworkResponse.Loading(false)) }
+    }.onStart {
+        // Emit loading state at the beginning of the network request.
+        emit(NetworkResponse.Loading(true))
+    }.onCompletion {
+        // Emit loading state when the network request is completed.
+        emit(NetworkResponse.Loading(false))
+    }
 
+/**
+ * Apply common side effects to a flow of NetworkResponse for paging network requests.
+ * This function handles retries, loading state management, and error handling.
+ *
+ * @param forPaging Indicates whether loading state should be emitted (true) or not (false).
+ * @return A modified flow with added side effects.
+ */
 fun <T : Any> Flow<NetworkResponse<T>>.applyCommonSideEffects(forPaging: Boolean) =
     retryWhen { cause, attempt ->
         when {
+            // Retry when an IOException occurs within the maximum retry limit.
             (cause is IOException && attempt < MAX_RETRIES) -> {
                 delay(getBackoffDelay(attempt))
                 true
             }
 
-            else -> {
-                false
-            }
+            else -> false
         }
     }.onStart {
         if (!forPaging) {
+            // Emit loading state at the beginning of the network request (if not for paging).
             emit(NetworkResponse.Loading(true))
         }
     }.onCompletion {
         if (!forPaging) {
+            // Emit loading state when the network request is completed (if not for paging).
             emit(NetworkResponse.Loading(false))
         }
     }

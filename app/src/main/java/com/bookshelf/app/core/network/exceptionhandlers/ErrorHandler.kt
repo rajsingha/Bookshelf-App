@@ -9,19 +9,26 @@ import com.google.gson.JsonSyntaxException
 import okhttp3.ResponseBody
 import java.net.ConnectException
 
+/**
+ * A utility object for handling network and API-related errors. It provides methods for generating
+ * network response with error information and handling error responses from the API.
+ */
 object ErrorHandler {
     const val MAX_CHARS = 150
     const val NO_INTERNET_ERROR_CODE = 1
     const val NETWORK_ERROR_MESSAGE =
-        "No internet connection, Please check you mobile data or Wi-fi"
+        "No internet connection, Please check your mobile data or Wi-Fi"
     const val PLEASE_TRY_AGAIN = "Failed to connect to the server, Please try after some time"
     const val SOMETHING_WRONG_TRY_AGAIN = "Something went wrong. Please try again later!"
     const val PARSING_ERROR = "PARSING_ERROR"
 
-
-    inline fun <reified T> handleException(
-        exception: Exception
-    ): NetworkResponse<T> {
+    /**
+     * Handles exceptions and generates a NetworkResponse with error information.
+     *
+     * @param exception The exception to handle.
+     * @return A NetworkResponse with error information.
+     */
+    inline fun <reified T> handleException(exception: Exception): NetworkResponse<T> {
         return when (exception) {
             is NoNetworkException -> {
                 NetworkResponse.Error(
@@ -65,6 +72,13 @@ object ErrorHandler {
         }
     }
 
+    /**
+     * Handles error responses from the API and generates a NetworkResponse with error information.
+     *
+     * @param errorBody The response body containing error details.
+     * @param code The HTTP status code of the response.
+     * @return A NetworkResponse with error information.
+     */
     inline fun <reified T> parseError(errorBody: ResponseBody?, code: Int): NetworkResponse<T> {
         try {
             errorBody?.charStream()?.readText()?.trim()?.let {
@@ -77,7 +91,7 @@ object ErrorHandler {
                 return NetworkResponse.Error(
                     ApiFailureException(
                         message = message,
-                        code = code,
+                        code = code
                     )
                 )
             }

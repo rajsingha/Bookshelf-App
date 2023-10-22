@@ -12,18 +12,25 @@ import com.bookshelf.app.dashboard.data.models.BooksDataResponseItem
 import com.bookshelf.app.dashboard.presentation.ui.BookInfoBottomSheetDialog
 import com.bookshelf.app.databinding.LayoutBookCardBinding
 
+/**
+ * `BooksAdapter` is a RecyclerView adapter for displaying a list of books in a list or grid layout.
+ *
+ * @property onItemSelected A callback function that is invoked when a book item is selected.
+ * @property onFavouriteSelected A callback function that is invoked when the favorite icon for a book is clicked.
+ */
 class BooksAdapter(
     private val onItemSelected: (position: Int, book: BooksDataResponseItem) -> Unit,
     private val onFavouriteSelected: (book: BooksDataResponseItem) -> Unit
 ) :
     RecyclerView.Adapter<BooksAdapter.BooksViewHolder>() {
+    // Private properties
     private var bookList: MutableList<BooksDataResponseItem>? = null
     private var fragmentManager: FragmentManager? = null
     private var position = -1
     private var favouriteTabActive = false
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BooksViewHolder {
+        // Create and return a new `BooksViewHolder` instance.
         return BooksViewHolder(
             LayoutBookCardBinding.inflate(
                 LayoutInflater.from(parent.context), parent, false
@@ -36,6 +43,7 @@ class BooksAdapter(
     }
 
     override fun onBindViewHolder(holder: BooksViewHolder, position: Int) {
+        // Bind data to the `BooksViewHolder` based on the item position.
         this.position = holder.bindingAdapterPosition
         if (favouriteTabActive) {
             bookList?.filter { it.isFavourite == 1 }?.toMutableList()?.get(position)?.let {
@@ -49,6 +57,7 @@ class BooksAdapter(
     }
 
     override fun getItemCount(): Int {
+        // Return the number of items to be displayed in the RecyclerView.
         if (favouriteTabActive) {
             bookList?.filter { it.isFavourite == 1 }?.toMutableList().let {
                 return it?.size ?: 0
@@ -58,6 +67,9 @@ class BooksAdapter(
         }
     }
 
+    /**
+     * `BooksViewHolder` is an inner class for holding and managing views for each book item.
+     */
     class BooksViewHolder(
         private val binding: LayoutBookCardBinding,
         private val context: Context,
@@ -67,6 +79,7 @@ class BooksAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(book: BooksDataResponseItem, booksAdapter: BooksAdapter) {
             book.run {
+                // Bind book data to views within the `BooksViewHolder`.
                 if (isFavourite == 1) {
                     binding.ivFav.setColorFilter(context.getColor(R.color.golden))
                 } else {
@@ -87,8 +100,10 @@ class BooksAdapter(
                 }
             }
 
+            // Set click listeners for book title and favorite icon.
             binding.tvBookTitle.clickWithDebounce {
                 fragmentManager?.let {
+                    // Show a bottom sheet dialog when the book title is clicked.
                     BookInfoBottomSheetDialog().show(it, book) { bookData ->
                         onFavouriteSelected.invoke(book)
                     }
@@ -98,12 +113,14 @@ class BooksAdapter(
             }
 
             binding.ivFav.clickWithDebounce {
+                // Toggle the favorite status of the book and update the view.
                 booksAdapter.markOrUnmark(book)
             }
         }
     }
 
     private fun markOrUnmark(book: BooksDataResponseItem) {
+        // Handle marking or unmarking a book as a favorite.
         val currentPosition = bookList?.indexOf(book) ?: -1
         if (currentPosition != -1) {
             val currentBook = bookList?.get(currentPosition)
@@ -118,14 +135,23 @@ class BooksAdapter(
         onFavouriteSelected.invoke(book)
     }
 
+    /**
+     * Set the `FragmentManager` for handling fragment transactions.
+     */
     fun setFragmentManager(fragmentManager: FragmentManager) {
         this.fragmentManager = fragmentManager
     }
 
+    /**
+     * Set whether the favorite tab is active or not.
+     */
     fun isFavouriteTabActive(state: Boolean) {
         this.favouriteTabActive = state
     }
 
+    /**
+     * Set the data for the adapter to display.
+     */
     fun setData(dataList: MutableList<BooksDataResponseItem>) {
         this.bookList = dataList
         notifyDataSetChanged()

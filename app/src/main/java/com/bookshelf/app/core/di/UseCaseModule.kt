@@ -16,10 +16,23 @@ import dagger.hilt.android.components.ViewModelComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 
+/**
+ * Dagger Hilt module responsible for providing instances of use cases for ViewModels.
+ */
 @Module
 @InstallIn(ViewModelComponent::class)
 object UseCaseModule {
 
+    /**
+     * Provides a [RegistrationUseCase] instance with its dependencies injected.
+     *
+     * @param registrationRepo An implementation of the [RegistrationRepo] interface.
+     * @param userCredsDao An instance of [UserCredsDao] for user credentials data access.
+     * @param countryDao An instance of [CountryDao] for country data access.
+     * @param sessionRepo An instance of [SessionRepository] for user session management.
+     * @param context The Android application context.
+     * @return An instance of [RegistrationUseCase] with its dependencies injected.
+     */
     @Provides
     @ViewModelScoped
     fun provideRegistrationUseCase(
@@ -30,6 +43,15 @@ object UseCaseModule {
         @ApplicationContext context: Context
     ) = RegistrationUseCase(registrationRepo, userCredsDao, countryDao, sessionRepo, context)
 
+    /**
+     * Provides a [DashboardUseCase] instance with its dependencies injected.
+     *
+     * @param dashboardRepo An implementation of the [DashboardRepo] interface.
+     * @param booksDao An instance of [BooksDao] for books data access.
+     * @param sessionRepo An instance of [SessionRepository] for user session management.
+     * @param context The Android application context.
+     * @return An instance of [DashboardUseCase] with its dependencies injected.
+     */
     @Provides
     @ViewModelScoped
     fun provideDashboardUseCase(
@@ -38,5 +60,4 @@ object UseCaseModule {
         sessionRepo: SessionRepository,
         @ApplicationContext context: Context
     ) = DashboardUseCase(dashboardRepo, sessionRepo, context, booksDao)
-
 }
