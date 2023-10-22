@@ -1,5 +1,6 @@
 package com.bookshelf.app.core.di
 
+import com.bookshelf.app.dashboard.data.datasource.DashboardDataSource
 import com.bookshelf.app.registration.data.datasource.RegistrationDataSource
 import dagger.Module
 import dagger.Provides
@@ -15,5 +16,11 @@ object DataSourceModule {
     @Singleton
     fun provideRegistrationDataSource(retrofit: Retrofit): RegistrationDataSource {
         return retrofit.create(RegistrationDataSource::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideDashboardDataSource(retrofit: Retrofit): DashboardDataSource {
+        return retrofit.create(DashboardDataSource::class.java)
     }
 }

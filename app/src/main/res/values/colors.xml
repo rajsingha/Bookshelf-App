@@ -6,4 +6,6 @@
     <color name="off_blue">#9EC1C7D3</color>
     <color name="dark_grey">#141416</color>
     <color name="red">#FF6161</color>
+    <color name="golden">#F6A11C</color>
+    <color name="grey">#A0A0A0</color>
 </resources>

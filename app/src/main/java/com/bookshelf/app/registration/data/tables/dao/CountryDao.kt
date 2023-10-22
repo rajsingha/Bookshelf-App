@@ -18,5 +18,5 @@ interface CountryDao {
     suspend fun getRowCount(): Int
 
     @Query("DELETE FROM tbl_country")
-    suspend fun clearSession()
+    suspend fun clearCountryData()
 }

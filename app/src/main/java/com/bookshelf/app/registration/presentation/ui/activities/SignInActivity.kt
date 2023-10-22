@@ -11,6 +11,7 @@ import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
 import com.bookshelf.app.core.utils.showToast
 import com.bookshelf.app.core.utils.validateEmail
 import com.bookshelf.app.core.utils.validatePassword
+import com.bookshelf.app.dashboard.presentation.ui.activities.DashboardActivity
 import com.bookshelf.app.databinding.ActivitySignInBinding
 import com.bookshelf.app.registration.data.models.LoginResult
 import com.bookshelf.app.registration.data.models.SessionResult
@@ -56,7 +57,8 @@ class SignInActivity : BaseActivity() {
         collectLatestLifecycleFlow(sessionManager.sessionObserver()) {
             when (it) {
                 is SessionResult.Active -> {
-                    showToast("Session Active")
+                    startActivity(Intent(this, DashboardActivity::class.java))
+                    finish()
                 }
 
                 is SessionResult.NotActive -> {

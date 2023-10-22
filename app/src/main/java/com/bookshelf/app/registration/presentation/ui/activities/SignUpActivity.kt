@@ -15,7 +15,7 @@ import com.bookshelf.app.core.utils.showToast
 import com.bookshelf.app.core.utils.validateEmail
 import com.bookshelf.app.core.utils.validatePassword
 import com.bookshelf.app.databinding.ActivitySignUpBinding
-import com.bookshelf.app.registration.data.models.IPAdressResponse
+import com.bookshelf.app.registration.data.models.IPAddressResponse
 import com.bookshelf.app.registration.data.models.SignupResult
 import com.bookshelf.app.registration.data.tables.CountryEntity
 import com.bookshelf.app.registration.presentation.viewmodels.SignupViewModel
@@ -28,6 +28,7 @@ class SignUpActivity : BaseActivity() {
     private var countryEntityList = mutableListOf<CountryEntity>()
     private lateinit var arrayAdapter: ArrayAdapter<String>
     private var mutableCountryList = mutableListOf<String>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
@@ -92,8 +93,8 @@ class SignUpActivity : BaseActivity() {
         }
     }
 
-    private fun setCountryIfAvailable(ipAdressResponse: IPAdressResponse) {
-        ipAdressResponse.country?.let { ipCountry ->
+    private fun setCountryIfAvailable(ipAddressResponse: IPAddressResponse) {
+        ipAddressResponse.country?.let { ipCountry ->
             val isCountryInList = countryEntityList.any { it.country == ipCountry }
             if (isCountryInList) {
                 val position = mutableCountryList.indexOf(ipCountry)
@@ -165,7 +166,6 @@ class SignUpActivity : BaseActivity() {
                     // Handle nothing selected.
                 }
             }
-
     }
 
     private fun isMinimum3chars(textField: String): Boolean {

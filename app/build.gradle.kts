@@ -85,16 +85,19 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:2.6.2")
 
     //Retrofit and GSON
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("com.squareup.retrofit2:converter-scalars:2.9.0")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-scalars:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.1")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.1")
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
     implementation("com.google.code.gson:gson:2.9.0")
     implementation("com.android.volley:volley:1.2.1")
 
     //encryption
     implementation("at.favre.lib:bcrypt:0.10.2")
+
+    //coil-image-loading
+    implementation("io.coil-kt:coil:2.4.0")
 }
 
 kapt {

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bookshelf.app.core.network.NetworkResponse
 import com.bookshelf.app.core.network.exceptionhandlers.ApiFailureException
-import com.bookshelf.app.registration.data.models.IPAdressResponse
+import com.bookshelf.app.registration.data.models.IPAddressResponse
 import com.bookshelf.app.registration.data.models.SignupResult
 import com.bookshelf.app.registration.data.tables.CountryEntity
 import com.bookshelf.app.registration.data.tables.UserCredsEntity
@@ -36,7 +36,7 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
     private val _countryList = Channel<MutableList<CountryEntity>>()
     val countryList = _countryList.receiveAsFlow()
 
-    private val _ipInfo = Channel<IPAdressResponse>()
+    private val _ipInfo = Channel<IPAddressResponse>()
     val ipInfo = _ipInfo.receiveAsFlow()
 
 

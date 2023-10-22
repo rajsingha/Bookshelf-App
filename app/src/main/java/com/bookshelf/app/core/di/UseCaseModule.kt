@@ -1,6 +1,9 @@
 package com.bookshelf.app.core.di
 
 import android.content.Context
+import com.bookshelf.app.dashboard.data.tables.dao.BooksDao
+import com.bookshelf.app.dashboard.domain.repository.DashboardRepo
+import com.bookshelf.app.dashboard.domain.usecase.DashboardUseCase
 import com.bookshelf.app.registration.data.tables.dao.CountryDao
 import com.bookshelf.app.registration.data.tables.dao.UserCredsDao
 import com.bookshelf.app.registration.domain.repository.RegistrationRepo
@@ -26,5 +29,14 @@ object UseCaseModule {
         sessionRepo: SessionRepository,
         @ApplicationContext context: Context
     ) = RegistrationUseCase(registrationRepo, userCredsDao, countryDao, sessionRepo, context)
+
+    @Provides
+    @ViewModelScoped
+    fun provideDashboardUseCase(
+        dashboardRepo: DashboardRepo,
+        booksDao: BooksDao,
+        sessionRepo: SessionRepository,
+        @ApplicationContext context: Context
+    ) = DashboardUseCase(dashboardRepo, sessionRepo, context, booksDao)
 
 }
