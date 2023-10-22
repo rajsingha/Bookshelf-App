@@ -3,9 +3,9 @@ package com.bookshelf.app.registration.presentation.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.bookshelf.app.R
+import com.bookshelf.app.core.baseui.BaseActivity
 import com.bookshelf.app.core.utils.clickWithDebounce
 import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
 import com.bookshelf.app.core.utils.showToast
@@ -19,7 +19,7 @@ import com.bookshelf.app.registration.presentation.viewmodels.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SignInActivity : AppCompatActivity() {
+class SignInActivity : BaseActivity() {
     private lateinit var binding: ActivitySignInBinding
     private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var sessionManager: SessionManager
@@ -66,12 +66,7 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        setOnClickListeners()
-    }
-
-    private fun setOnClickListeners() {
+    override fun setOnclickListener() {
         binding.etUserEmail.doAfterTextChanged {
             if (validateEmail(binding.etUserEmail.text.toString()).not()) {
                 binding.tilUserEmail.error = getString(R.string.please_enter_a_valid_email_address)

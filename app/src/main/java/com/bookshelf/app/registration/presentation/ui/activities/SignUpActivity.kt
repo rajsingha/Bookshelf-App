@@ -6,9 +6,9 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import com.bookshelf.app.R
+import com.bookshelf.app.core.baseui.BaseActivity
 import com.bookshelf.app.core.utils.clickWithDebounce
 import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
 import com.bookshelf.app.core.utils.showToast
@@ -22,7 +22,7 @@ import com.bookshelf.app.registration.presentation.viewmodels.SignupViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class SignUpActivity : AppCompatActivity() {
+class SignUpActivity : BaseActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private val signupViewModel: SignupViewModel by viewModels()
     private var countryEntityList = mutableListOf<CountryEntity>()
@@ -84,7 +84,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         collectLatestLifecycleFlow(signupViewModel.isLoading) {
-
+            showProgress(it)
         }
 
         collectLatestLifecycleFlow(signupViewModel.signUpButtonState) {
@@ -102,12 +102,7 @@ class SignUpActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        setOnClickListener()
-    }
-
-    private fun setOnClickListener() {
+    override fun setOnclickListener() {
         binding.etUserName.doAfterTextChanged {
             if (isMinimum3chars(binding.etUserName.text.toString()).not()) {
                 binding.tilUserName.error = getString(R.string.please_enter_minimum_3_characters)
