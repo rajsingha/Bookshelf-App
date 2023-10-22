@@ -1,6 +1,7 @@
 package com.bookshelf.app.core.di
 
 import android.content.Context
+import com.bookshelf.app.registration.data.tables.dao.CountryDao
 import com.bookshelf.app.registration.data.tables.dao.UserCredsDao
 import com.bookshelf.app.registration.domain.repository.RegistrationRepo
 import com.bookshelf.app.registration.domain.repository.SessionRepository
@@ -21,8 +22,9 @@ object UseCaseModule {
     fun provideRegistrationUseCase(
         registrationRepo: RegistrationRepo,
         userCredsDao: UserCredsDao,
+        countryDao: CountryDao,
         sessionRepo: SessionRepository,
         @ApplicationContext context: Context
-    ) = RegistrationUseCase(registrationRepo, userCredsDao, sessionRepo, context)
+    ) = RegistrationUseCase(registrationRepo, userCredsDao, countryDao, sessionRepo, context)
 
 }

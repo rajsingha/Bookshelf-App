@@ -19,4 +19,5 @@
     <string name="already_account_sign_in">Already Account, <font color="#FF0000">Sign In</font></string>
     <string name="please_enter_a_valid_email_password"><![CDATA[Please enter a valid email & password!]]></string>
     <string name="account_already_exist_please_do_sign_in">Account already exist, please do Sign In!</string>
+    <string name="select_country">Select Your Country</string>
 </resources>

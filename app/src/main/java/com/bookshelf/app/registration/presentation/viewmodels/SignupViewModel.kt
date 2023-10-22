@@ -1,16 +1,14 @@
 package com.bookshelf.app.registration.presentation.viewmodels
 
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.Network
-import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.favre.lib.crypto.bcrypt.BCrypt
 import com.bookshelf.app.core.network.NetworkResponse
 import com.bookshelf.app.core.network.exceptionhandlers.ApiFailureException
-import com.bookshelf.app.registration.data.models.CountryResponse
+import com.bookshelf.app.registration.data.models.IPAdressResponse
 import com.bookshelf.app.registration.data.models.SignupResult
+import com.bookshelf.app.registration.data.tables.CountryEntity
 import com.bookshelf.app.registration.data.tables.UserCredsEntity
 import com.bookshelf.app.registration.domain.usecase.RegistrationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -35,31 +33,90 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
     private val _signUpButtonState = Channel<Boolean>()
     val signUpButtonState = _signUpButtonState.receiveAsFlow()
 
-    private val _countryList = Channel<CountryResponse>()
+    private val _countryList = Channel<MutableList<CountryEntity>>()
     val countryList = _countryList.receiveAsFlow()
 
+    private val _ipInfo = Channel<IPAdressResponse>()
+    val ipInfo = _ipInfo.receiveAsFlow()
+
+
     init {
-        getCountryList()
+        viewModelScope.launch {
+            if (useCase.getCountryRowCount() == 0) {
+                getCountryList()
+            } else {
+                getCountryListFromDb()
+            }
+        }
     }
 
-    private fun getCountryList() {
-        viewModelScope.launch(Dispatchers.IO) {
-            useCase.getCountryList().collect {
-                withContext(Dispatchers.Main.immediate) {
-                    when (it) {
-                        is NetworkResponse.Error -> {
-                            _apiError.send(it.error)
-                        }
+    private suspend fun getCountryList() {
+        useCase.getCountryList().collect {
+            withContext(Dispatchers.Main.immediate) {
+                when (it) {
+                    is NetworkResponse.Error -> {
+                        _apiError.send(it.error)
+                    }
 
-                        is NetworkResponse.Loading -> {
-                            _isLoading.send(it.isLoading)
-                        }
+                    is NetworkResponse.Loading -> {
+                        _isLoading.send(it.isLoading)
+                    }
 
-                        is NetworkResponse.Success -> {
-                            _countryList.send(it.data)
+                    is NetworkResponse.Success -> {
+                        val countriesList = it.data.data.mapNotNull { (_, value) ->
+                            value.country?.let { countryName ->
+                                CountryEntity(
+                                    country = countryName,
+                                )
+                            }
+                        }.toMutableList()
+                        _countryList.send(countriesList)
+
+                        val countriesToInsert =
+                            it.data.data.values.map {
+                                it.country?.let { it1 -> CountryEntity(country = it1) }
+                            }
+                        countriesToInsert.forEach {
+                            Log.e("LIST", it.toString())
+                            if (it != null) {
+                                insertCountriesIntoDb(it)
+                            }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    fun getIPAddressInfo() {
+        viewModelScope.launch(Dispatchers.IO) {
+            useCase.getIpInfo().collect {
+                withContext(Dispatchers.Main.immediate) {
+                    when (it) {
+                        is NetworkResponse.Error -> _apiError.send(it.error)
+                        is NetworkResponse.Loading -> _isLoading.send(it.isLoading)
+                        is NetworkResponse.Success -> {
+                            _ipInfo.send(it.data)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun insertCountriesIntoDb(countryEntity: CountryEntity) {
+        viewModelScope.launch(Dispatchers.Main.immediate) {
+            useCase.insertCountriesInDb(countryEntity)
+        }
+    }
+
+    fun getCountryListFromDb() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val countryEntity = useCase.getCountriesFromDb()
+            withContext(Dispatchers.Main.immediate) {
+                countryEntity?.let {
+                    _countryList.send(it)
+                } ?: _apiError.send(ApiFailureException("Something went wrong", code = 500))
             }
         }
     }
@@ -96,29 +153,6 @@ class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vi
 
     private fun hashPassword(enteredPass: String, cost: Int = 12): String =
         BCrypt.withDefaults().hashToString(cost, enteredPass.toCharArray())
-
-    fun getIpAddress(): String? {
-        val connectivityManager =
-            useCase.context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network: Network? = connectivityManager.activeNetwork
-        val networkCapabilities: NetworkCapabilities? =
-            connectivityManager.getNetworkCapabilities(network)
-
-        if (networkCapabilities != null) {
-            if (networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
-            ) {
-                val linkProperties = connectivityManager.getLinkProperties(network)
-                linkProperties?.linkAddresses?.forEach {
-                    val ip = it.address.hostAddress
-                    if (ip.contains(":").not()) {
-                        return ip
-                    }
-                }
-            }
-        }
-        return null
-    }
 
     fun updateSignUpButtonState(state: Boolean) {
         viewModelScope.launch(Dispatchers.Main.immediate) {

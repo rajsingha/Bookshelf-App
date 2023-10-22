@@ -81,6 +81,13 @@
                         app:hintTextColor="#202020" />
                 </com.google.android.material.textfield.TextInputLayout>
 
+                <Spinner
+                    android:id="@+id/country_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/bg_btn_bordered_light"
+                    android:prompt="@string/select_country" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/til_user_email"

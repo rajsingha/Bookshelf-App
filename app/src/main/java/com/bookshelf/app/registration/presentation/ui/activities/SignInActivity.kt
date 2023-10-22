@@ -1,4 +1,4 @@
-package com.bookshelf.app.registration.presentation.ui
+package com.bookshelf.app.registration.presentation.ui.activities
 
 import android.content.Intent
 import android.os.Bundle

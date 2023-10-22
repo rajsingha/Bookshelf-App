@@ -5,6 +5,6 @@ data class CountryResponse(
 )
 
 data class Country(
-    val country: String,
-    val region: String
+    val country: String? = null,
+    val region: String? = null
 )

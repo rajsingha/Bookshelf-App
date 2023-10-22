@@ -3,6 +3,7 @@ package com.bookshelf.app.core.di
 import android.content.Context
 import androidx.room.Room
 import com.bookshelf.app.core.database.AppDatabase
+import com.bookshelf.app.registration.data.tables.dao.CountryDao
 import com.bookshelf.app.registration.data.tables.dao.SessionDao
 import com.bookshelf.app.registration.data.tables.dao.UserCredsDao
 import dagger.Module
@@ -34,5 +35,10 @@ object DatabaseModule {
     @Provides
     fun provideUserSessionDao(database: AppDatabase): SessionDao {
         return database.userSessionDao()
+    }
+
+    @Provides
+    fun provideCountryDao(database: AppDatabase): CountryDao {
+        return database.countryDao()
     }
 }

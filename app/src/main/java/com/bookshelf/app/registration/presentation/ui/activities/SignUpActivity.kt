@@ -1,7 +1,10 @@
-package com.bookshelf.app.registration.presentation.ui
+package com.bookshelf.app.registration.presentation.ui.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
@@ -12,7 +15,9 @@ import com.bookshelf.app.core.utils.showToast
 import com.bookshelf.app.core.utils.validateEmail
 import com.bookshelf.app.core.utils.validatePassword
 import com.bookshelf.app.databinding.ActivitySignUpBinding
+import com.bookshelf.app.registration.data.models.IPAdressResponse
 import com.bookshelf.app.registration.data.models.SignupResult
+import com.bookshelf.app.registration.data.tables.CountryEntity
 import com.bookshelf.app.registration.presentation.viewmodels.SignupViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -20,7 +25,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class SignUpActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private val signupViewModel: SignupViewModel by viewModels()
-
+    private var countryEntityList = mutableListOf<CountryEntity>()
+    private lateinit var arrayAdapter: ArrayAdapter<String>
+    private var mutableCountryList = mutableListOf<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
@@ -30,15 +37,25 @@ class SignUpActivity : AppCompatActivity() {
     }
 
     private fun initView() {
-        //TODO
+        arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mutableCountryList)
+        binding.countrySpinner.adapter = arrayAdapter
+    }
+
+    private fun convertCountryToStringArray() {
+        mutableCountryList.clear()
+        mutableCountryList.add(getString(R.string.select_country))
+        countryEntityList.forEach {
+            mutableCountryList.add(it.country)
+        }
+        arrayAdapter.notifyDataSetChanged()
     }
 
     private fun apiObservers() {
         collectLatestLifecycleFlow(signupViewModel.countryList) {
-            val countries = it.data.values
-            countries.forEach { country ->
-                showToast(country.country)
-            }
+            countryEntityList.clear()
+            countryEntityList = it
+            convertCountryToStringArray()
+            signupViewModel.getIPAddressInfo()
         }
 
         collectLatestLifecycleFlow(signupViewModel.signupResult) {
@@ -48,7 +65,9 @@ class SignUpActivity : AppCompatActivity() {
                 }
 
                 SignupResult.Success -> {
-                    showToast("Signup Success")
+                    showToast("Signup Successful, you can Sign In now")
+                    startActivity(Intent(this, SignInActivity::class.java))
+                    finish()
                 }
 
                 SignupResult.UserEmailTaken -> {
@@ -57,6 +76,9 @@ class SignUpActivity : AppCompatActivity() {
             }
         }
 
+        collectLatestLifecycleFlow(signupViewModel.ipInfo) { ipAdressResponse ->
+            setCountryIfAvailable(ipAdressResponse)
+        }
         collectLatestLifecycleFlow(signupViewModel.apiError) {
             it?.message?.let { it1 -> showToast(it1) }
         }
@@ -67,6 +89,16 @@ class SignUpActivity : AppCompatActivity() {
 
         collectLatestLifecycleFlow(signupViewModel.signUpButtonState) {
             binding.btnSignUp.isEnabled = it
+        }
+    }
+
+    private fun setCountryIfAvailable(ipAdressResponse: IPAdressResponse) {
+        ipAdressResponse.country?.let { ipCountry ->
+            val isCountryInList = countryEntityList.any { it.country == ipCountry }
+            if (isCountryInList) {
+                val position = mutableCountryList.indexOf(ipCountry)
+                binding.countrySpinner.setSelection(position)
+            }
         }
     }
 
@@ -117,9 +149,28 @@ class SignUpActivity : AppCompatActivity() {
                 binding.etUserName.text.toString(),
                 binding.etUserEmail.text.toString(),
                 binding.etPassword.text.toString(),
-                country = "India"
+                binding.countrySpinner.selectedItem.toString()
             )
         }
+
+        binding.countrySpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>?,
+                    view: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    if (position != 0) {
+                        isAllFieldsValid()
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {
+                    // Handle nothing selected.
+                }
+            }
+
     }
 
     private fun isMinimum3chars(textField: String): Boolean {
@@ -133,6 +184,11 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             (binding.etUserEmail.text?.isEmpty() == true || binding.tilUserEmail.isErrorEnabled) -> {
+                signupViewModel.updateSignUpButtonState(false)
+            }
+
+            (binding.countrySpinner.selectedItem.toString() == mutableCountryList[0]
+                    || binding.countrySpinner.selectedItem.toString().isEmpty()) -> {
                 signupViewModel.updateSignUpButtonState(false)
             }
 

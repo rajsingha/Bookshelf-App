@@ -22,13 +22,17 @@ class LoginViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vie
     private val _signInButtonState = Channel<Boolean>()
     val signInButtonState = _signInButtonState.receiveAsFlow()
 
+
     fun login(email: String, password: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val userCreds = useCase.getUserByUserEmail(email)
+            val userCredsEntity = useCase.getUserByUserEmail(email)
             withContext(Dispatchers.Main.immediate) {
                 when {
-                    (userCreds != null && isPasswordVerified(password, userCreds.passwordHash)) -> {
-                        _loginResult.send(LoginResult.Success(userCreds))
+                    (userCredsEntity != null && isPasswordVerified(
+                        password,
+                        userCredsEntity.passwordHash
+                    )) -> {
+                        _loginResult.send(LoginResult.Success(userCredsEntity))
                     }
 
                     else -> _loginResult.send(LoginResult.Failure)
@@ -36,6 +40,7 @@ class LoginViewModel @Inject constructor(val useCase: RegistrationUseCase) : Vie
             }
         }
     }
+
 
     private fun isPasswordVerified(enteredPassword: String, storedHash: String): Boolean {
         return BCrypt.verifyer().verify(enteredPassword.toCharArray(), storedHash).verified

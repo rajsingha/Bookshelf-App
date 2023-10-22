@@ -20,7 +20,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_in)
-        Toast.makeText(this,signupViewModel.getIpAddress().toString(),Toast.LENGTH_SHORT).show()
         sessionManager = SessionManager(signupViewModel.useCase.sessionRepo)
         collectLatestLifecycleFlow(sessionManager.sessionObserver()){
 

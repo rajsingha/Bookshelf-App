@@ -17,4 +17,10 @@ class RegistrationRepoImpl @Inject constructor(private val dataSource: Registrat
         emit(response)
     }.applyCommonSideEffects().catch { emit(ErrorHandler.handleException(it as Exception)) }
 
+    override suspend fun getIpInfo() = flow {
+        val response =
+            safeApiCall { dataSource.getIpInfo() }
+        emit(response)
+    }.applyCommonSideEffects().catch { emit(ErrorHandler.handleException(it as Exception)) }
 }
+
