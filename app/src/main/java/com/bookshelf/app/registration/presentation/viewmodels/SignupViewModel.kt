@@ -7,6 +7,9 @@ import android.net.NetworkCapabilities
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import at.favre.lib.crypto.bcrypt.BCrypt
+import com.bookshelf.app.core.network.NetworkResponse
+import com.bookshelf.app.core.network.exceptionhandlers.ApiFailureException
+import com.bookshelf.app.registration.data.models.CountryResponse
 import com.bookshelf.app.registration.data.models.SignupResult
 import com.bookshelf.app.registration.data.tables.UserCredsEntity
 import com.bookshelf.app.registration.domain.usecase.RegistrationUseCase
@@ -20,11 +23,46 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignupViewModel @Inject constructor(val useCase: RegistrationUseCase) : ViewModel() {
+    private val _isLoading = Channel<Boolean>()
+    val isLoading = _isLoading.receiveAsFlow()
+
+    private val _apiError = Channel<ApiFailureException?>()
+    val apiError = _apiError.receiveAsFlow()
+
     private val _signupResult = Channel<SignupResult>()
     val signupResult = _signupResult.receiveAsFlow()
 
     private val _signUpButtonState = Channel<Boolean>()
     val signUpButtonState = _signUpButtonState.receiveAsFlow()
+
+    private val _countryList = Channel<CountryResponse>()
+    val countryList = _countryList.receiveAsFlow()
+
+    init {
+        getCountryList()
+    }
+
+    private fun getCountryList() {
+        viewModelScope.launch(Dispatchers.IO) {
+            useCase.getCountryList().collect {
+                withContext(Dispatchers.Main.immediate) {
+                    when (it) {
+                        is NetworkResponse.Error -> {
+                            _apiError.send(it.error)
+                        }
+
+                        is NetworkResponse.Loading -> {
+                            _isLoading.send(it.isLoading)
+                        }
+
+                        is NetworkResponse.Success -> {
+                            _countryList.send(it.data)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     fun signup(username: String, email: String, password: String, country: String) {
         viewModelScope.launch(Dispatchers.IO) {

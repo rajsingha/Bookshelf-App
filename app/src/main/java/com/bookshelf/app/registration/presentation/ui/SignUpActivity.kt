@@ -25,10 +25,22 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        initView()
         apiObservers()
     }
 
+    private fun initView() {
+        //TODO
+    }
+
     private fun apiObservers() {
+        collectLatestLifecycleFlow(signupViewModel.countryList) {
+            val countries = it.data.values
+            countries.forEach { country ->
+                showToast(country.country)
+            }
+        }
+
         collectLatestLifecycleFlow(signupViewModel.signupResult) {
             when (it) {
                 SignupResult.Failure -> {
@@ -43,6 +55,14 @@ class SignUpActivity : AppCompatActivity() {
                     showToast(getString(R.string.account_already_exist_please_do_sign_in))
                 }
             }
+        }
+
+        collectLatestLifecycleFlow(signupViewModel.apiError) {
+            it?.message?.let { it1 -> showToast(it1) }
+        }
+
+        collectLatestLifecycleFlow(signupViewModel.isLoading) {
+
         }
 
         collectLatestLifecycleFlow(signupViewModel.signUpButtonState) {
