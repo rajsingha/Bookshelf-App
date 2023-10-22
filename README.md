@@ -39,6 +39,6 @@ To run the project locally and explore the book management and reading platform,
 
 1. Clone the repository:
 
-   ```bash
+   ```bash[
    git clone https://github.com/rajsingha/bookshelf-app.git
    cd bookshelf-app
