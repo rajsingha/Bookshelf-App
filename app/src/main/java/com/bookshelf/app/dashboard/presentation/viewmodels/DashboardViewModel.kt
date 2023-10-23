@@ -58,7 +58,7 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
     }
 
     private fun getBooksFromApi() {
-        viewModelScope.launch(Dispatchers.Main.immediate) {
+        viewModelScope.launch(Dispatchers.IO) {
             useCase.getBooksInfoFromApi().collect {
                 withContext(Dispatchers.Main.immediate) {
                     when (it) {
