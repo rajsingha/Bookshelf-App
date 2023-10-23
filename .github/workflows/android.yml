@@ -26,3 +26,6 @@ jobs:
       run: ./gradlew buildDebug
     - name: Upload Reports
       uses: actions/upload-artifact@v2
+      with:
+        name: Test-Reports
+        path: app/build/reports
