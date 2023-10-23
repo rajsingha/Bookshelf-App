@@ -1,3 +1,4 @@
+[![Android CI](https://github.com/rajsingha/Bookshelf-App/actions/workflows/android.yml/badge.svg)](https://github.com/rajsingha/Bookshelf-App/actions/workflows/android.yml)
 # Bookshelf-App
 
 ## Tech Stacks
