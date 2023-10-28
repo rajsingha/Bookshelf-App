@@ -38,6 +38,15 @@ To run the project locally and explore the book management and reading platform,
 
 ### Installation
 
+To install the Bookshelf-App, download the APK file from the following link:
+
+[Install Bookshelf-App APK](https://drive.google.com/file/d/1I4TQBxCOkmJJ1gWZuYVJ4opbDk8aOIQ5/view?usp=sharing)
+
+After downloading the APK, you can install it on your Android device.
+
+### Note:
+If prompted, make sure to allow installation from unknown sources in your device settings.
+
 1. Clone the repository:
 
    ```bash[
