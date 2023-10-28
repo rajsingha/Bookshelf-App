@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Calendar
 import javax.inject.Inject
 
 @HiltViewModel
@@ -50,8 +51,8 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
             val booksEntity = useCase.getAllBooksFromDB()
             withContext(Dispatchers.Main.immediate) {
                 booksEntity?.let {
-                    _sortedYears.send(processEntityAndSortYears(it))
-                    _sortedBooks.send(processAndSortByPublishedChapterDate(it))
+                    _sortedYears.send(processLocalEntityAndSortYears(it))
+                    _sortedBooks.send(processLocalEntityAndSortByYear(it))
                 } ?: _apiError.send(ApiFailureException("Something went wrong", code = 500))
             }
         }
@@ -72,7 +73,7 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
 
                         is NetworkResponse.Success -> {
                             _sortedYears.send(processResponseAndSortYears(it.data))
-                            _sortedBooks.send(processResponseAndSortByPublishedChapterDate(it.data))
+                            _sortedBooks.send(processApiResponseAndSortByYear(it.data))
                             insertBooksDataIntoDb(it.data)
                         }
                     }
@@ -97,7 +98,7 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
                 score = item.score,
                 popularity = item.popularity,
                 title = item.title,
-                publishedChapterDate = item.publishedChapterDate,
+                publishedChapterDate = convertTimestampToYear(item.publishedChapterDate).toLong(),
                 isFavourite = item.isFavourite
             )
         }.toMutableList()
@@ -105,22 +106,28 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
 
 
     private fun processResponseAndSortYears(booksData: MutableList<BooksDataResponseItem>): MutableList<Year> {
-        val years = booksData.mapNotNull { it.publishedChapterDate }
+        val years = booksData.mapNotNull {
+            it.publishedChapterDate?.let { timestamp ->
+                convertTimestampToYear(
+                    timestamp
+                )
+            }
+        }
         val uniqueYears = years.toSet()
         val sortedYears = uniqueYears.sortedDescending()
         val yearList = sortedYears.map { Year(it) }
         return yearList.toMutableList()
     }
 
-    private fun processEntityAndSortYears(booksData: MutableList<BooksEntity>): MutableList<Year> {
+    private fun processLocalEntityAndSortYears(booksData: MutableList<BooksEntity>): MutableList<Year> {
         val years = booksData.mapNotNull { it.publishedChapterDate }
         val uniqueYears = years.toSet()
         val sortedYears = uniqueYears.sortedDescending()
-        val yearList = sortedYears.map { Year(it) }
+        val yearList = sortedYears.map { Year(it.toInt()) }
         return yearList.toMutableList()
     }
 
-    private fun processAndSortByPublishedChapterDate(booksData: MutableList<BooksEntity>): MutableList<BooksDataResponseItem> {
+    private fun processLocalEntityAndSortByYear(booksData: MutableList<BooksEntity>): MutableList<BooksDataResponseItem> {
         return booksData
             .sortedByDescending { it.publishedChapterDate }
             .map { entity ->
@@ -138,9 +145,9 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
     }
 
 
-    private fun processResponseAndSortByPublishedChapterDate(booksData: BooksDataResponse): MutableList<BooksDataResponseItem> {
+    private fun processApiResponseAndSortByYear(booksData: BooksDataResponse): MutableList<BooksDataResponseItem> {
         return booksData
-            .sortedByDescending { it.publishedChapterDate }
+            .sortedByDescending { convertTimestampToYear(it.publishedChapterDate) }
             .map { entity ->
                 BooksDataResponseItem(
                     id = entity.id,
@@ -148,7 +155,7 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
                     score = entity.score,
                     popularity = entity.popularity,
                     title = entity.title,
-                    publishedChapterDate = entity.publishedChapterDate,
+                    publishedChapterDate = convertTimestampToYear(entity.publishedChapterDate).toLong(),
                     isFavourite = entity.isFavourite
                 )
             }
@@ -160,19 +167,19 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
             val searchBooks = useCase.searchBook(query)
             withContext(Dispatchers.Main.immediate) {
                 searchBooks?.let {
-                    _sortedBooks.send(processAndSortByPublishedChapterDate(it))
+                    _sortedBooks.send(processLocalEntityAndSortByYear(it))
                 } ?: _apiError.send(ApiFailureException("No data found!", code = 404))
             }
         }
     }
 
-    fun filterBooksByYear(year: Long) {
-        if (year != 0L) {
+    fun filterBooksByYear(year: Int) {
+        if (year != 0) {
             viewModelScope.launch(Dispatchers.IO) {
-                val filteredBooksByYear = useCase.filterBooksByYear(year)
+                val filteredBooksByYear = useCase.filterBooksByYear(year.toLong())
                 withContext(Dispatchers.Main.immediate) {
                     filteredBooksByYear?.let {
-                        _sortedBooks.send(processAndSortByPublishedChapterDate(it))
+                        _sortedBooks.send(processLocalEntityAndSortByYear(it))
                     }
                 } ?: _apiError.send(ApiFailureException("No data found!", code = 404))
             }
@@ -200,10 +207,18 @@ class DashboardViewModel @Inject constructor(val useCase: DashboardUseCase) : Vi
             val filteredBooksByFav = useCase.getFavouriteBooks()
             withContext(Dispatchers.Main.immediate) {
                 filteredBooksByFav?.let {
-                    _sortedBooks.send(processAndSortByPublishedChapterDate(it))
+                    _sortedBooks.send(processLocalEntityAndSortByYear(it))
                 }
             } ?: _apiError.send(ApiFailureException("No data found!", code = 404))
         }
+    }
+
+    private fun convertTimestampToYear(timestamp: Long?): Int {
+        val calendar = Calendar.getInstance()
+        if (timestamp != null) {
+            calendar.timeInMillis = timestamp * 1000
+        }
+        return calendar.get(Calendar.YEAR)
     }
 
 }
