@@ -29,7 +29,7 @@ The project follows a structured architecture combining the principles of MVVM a
 
 ## Getting Started
 
-To run the project locally and explore the book management and reading platform, follow these steps:
+To run the project locally, follow these steps:
 
 ### Prerequisites
 
