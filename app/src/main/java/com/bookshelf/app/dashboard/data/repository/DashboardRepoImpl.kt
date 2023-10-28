@@ -9,8 +9,19 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+/**
+ * Implementation of the `DashboardRepo` interface responsible for fetching book information.
+ *
+ * @param dataSource The data source for obtaining book information.
+ */
 class DashboardRepoImpl @Inject constructor(private val dataSource: DashboardDataSource) :
     DashboardRepo {
+
+    /**
+     * Fetches book information and provides it as a flow.
+     *
+     * @return A flow of book information.
+     */
     override suspend fun getBooksInfo() = flow {
         val response =
             safeApiCall { dataSource.getBooksInfo() }

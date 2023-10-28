@@ -7,6 +7,7 @@
     <string name="sign_in">SIGN IN</string>
     <string name="new_user_sign_up">New User, <font color="#FF0000">Sign Up</font></string>
     <string name="user_name_digits">abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ></string>
+    <string name="query_tags">-,_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ></string>
     <string name="query_digits"> -_.1234567890@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ></string>
     <string name="email_digits"><![CDATA[!@-_.1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]]></string>
     <string name="password_digits"><![CDATA[!@#$?<>!-=%^&*()_+.1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]]></string>
@@ -31,4 +32,10 @@
     <string name="lorem_ipsum">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets</string>
     <string name="signup_successful_you_can_sign_in_now">Signup Successful, you can Sign In now!</string>
     <string name="signup_failed">Signup Failed</string>
+    <string name="add_tag">Add Tag</string>
+    <string name="sort_by_year">Sort by year:</string>
+    <string name="enter_tags_comma_separated">Enter tags ( `,` comma-separated)</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="add_tags">Add Tags</string>
 </resources>

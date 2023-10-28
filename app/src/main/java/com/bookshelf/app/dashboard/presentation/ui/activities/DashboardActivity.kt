@@ -9,8 +9,8 @@ import com.bookshelf.app.core.baseui.BaseActivity
 import com.bookshelf.app.core.utils.collectLatestLifecycleFlow
 import com.bookshelf.app.core.utils.setDoubleClickListener
 import com.bookshelf.app.core.utils.showToast
-import com.bookshelf.app.dashboard.data.models.BooksDataResponseItem
 import com.bookshelf.app.dashboard.data.models.Year
+import com.bookshelf.app.dashboard.data.tables.BookWithMetadata
 import com.bookshelf.app.dashboard.presentation.ui.adapters.BooksAdapter
 import com.bookshelf.app.dashboard.presentation.ui.adapters.YearAdapter
 import com.bookshelf.app.dashboard.presentation.viewmodels.DashboardViewModel
@@ -40,7 +40,8 @@ class DashboardActivity : BaseActivity() {
     private val booksAdapter by lazy {
         BooksAdapter(
             onItemSelected = ::onBookItemSelected,
-            onFavouriteSelected = ::onBookMarkedFavourite
+            onFavouriteSelected = ::onBookMarkedFavourite,
+            onSaveTags = ::onSaveTags
         )
     }
 
@@ -80,7 +81,7 @@ class DashboardActivity : BaseActivity() {
         collectLatestLifecycleFlow(sessionManager.sessionObserver()) {
             when (it) {
                 is SessionResult.Active -> {
-
+                    dashboardViewModel.activeUserEmail = it.userSession.email
                 }
 
                 is SessionResult.NotActive -> {
@@ -98,7 +99,7 @@ class DashboardActivity : BaseActivity() {
                 when (menuItem.itemId) {
                     R.id.tab_home -> {
                         booksAdapter.isFavouriteTabActive(false)
-                        dashboardViewModel.getBooksFromDb()
+                        dashboardViewModel.getBooksList()
                     }
 
                     R.id.tab_fav -> {
@@ -113,7 +114,7 @@ class DashboardActivity : BaseActivity() {
                 }
                 lastSelectedItemId = menuItem.itemId
             }
-            true
+            return@setOnItemSelectedListener menuItem.itemId != R.id.tab_logout
         }
 
         binding.navBar.menu.findItem(R.id.tab_logout).setDoubleClickListener {
@@ -134,7 +135,7 @@ class DashboardActivity : BaseActivity() {
         }
     }
 
-    private fun onBookItemSelected(position: Int, booksDataResponseItem: BooksDataResponseItem) {
+    private fun onBookItemSelected(position: Int, bookData: BookWithMetadata?) {
 
     }
 
@@ -142,12 +143,16 @@ class DashboardActivity : BaseActivity() {
         year.year?.let { dashboardViewModel.filterBooksByYear(it) }
     }
 
-    private fun onBookMarkedFavourite(booksDataResponseItem: BooksDataResponseItem) {
-        if (booksDataResponseItem.isFavourite == 1) {
-            dashboardViewModel.markBookAsFavourite(booksDataResponseItem.id)
+    private fun onBookMarkedFavourite(bookWithMetadata: BookWithMetadata?) {
+        if (bookWithMetadata?.metadata?.isFavourite == 1) {
+            dashboardViewModel.markBookAsFavourite(bookWithMetadata)
         } else {
-            dashboardViewModel.unmarkFavouriteBook(booksDataResponseItem.id)
+            dashboardViewModel.unmarkFavouriteBook(bookWithMetadata?.metadata?.uid)
         }
+    }
+
+    private fun onSaveTags(bookWithMetadata: BookWithMetadata) {
+        dashboardViewModel.saveTags(bookWithMetadata)
     }
 
     override fun onDestroy() {

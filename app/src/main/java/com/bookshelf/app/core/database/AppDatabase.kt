@@ -3,7 +3,9 @@ package com.bookshelf.app.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.bookshelf.app.dashboard.data.tables.BooksEntity
+import com.bookshelf.app.dashboard.data.tables.BooksMetaDataEntity
 import com.bookshelf.app.dashboard.data.tables.dao.BooksDao
+import com.bookshelf.app.dashboard.data.tables.dao.BooksMetaDataDao
 import com.bookshelf.app.registration.data.tables.CountryEntity
 import com.bookshelf.app.registration.data.tables.SessionEntity
 import com.bookshelf.app.registration.data.tables.UserCredsEntity
@@ -20,7 +22,8 @@ import com.bookshelf.app.registration.data.tables.dao.UserCredsDao
         UserCredsEntity::class,
         SessionEntity::class,
         CountryEntity::class,
-        BooksEntity::class
+        BooksEntity::class,
+        BooksMetaDataEntity::class
     ],
     version = 1,
     exportSchema = false
@@ -54,4 +57,11 @@ abstract class AppDatabase : RoomDatabase() {
      * @return An instance of the BooksDao for performing database operations related to books data.
      */
     abstract fun booksDataDao(): BooksDao
+
+    /**
+     * Provides access to the DAO for BooksMetaDataEntity.
+     *
+     * @return An instance of the BooksMetaDataDao for performing database operations related to user books data.
+     */
+    abstract fun booksMetadataDao(): BooksMetaDataDao
 }

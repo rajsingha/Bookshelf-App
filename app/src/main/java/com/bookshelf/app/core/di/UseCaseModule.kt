@@ -2,6 +2,7 @@ package com.bookshelf.app.core.di
 
 import android.content.Context
 import com.bookshelf.app.dashboard.data.tables.dao.BooksDao
+import com.bookshelf.app.dashboard.data.tables.dao.BooksMetaDataDao
 import com.bookshelf.app.dashboard.domain.repository.DashboardRepo
 import com.bookshelf.app.dashboard.domain.usecase.DashboardUseCase
 import com.bookshelf.app.registration.data.tables.dao.CountryDao
@@ -57,7 +58,8 @@ object UseCaseModule {
     fun provideDashboardUseCase(
         dashboardRepo: DashboardRepo,
         booksDao: BooksDao,
+        booksMetaDataDao: BooksMetaDataDao,
         sessionRepo: SessionRepository,
         @ApplicationContext context: Context
-    ) = DashboardUseCase(dashboardRepo, sessionRepo, context, booksDao)
+    ) = DashboardUseCase(dashboardRepo, sessionRepo, context, booksDao, booksMetaDataDao)
 }

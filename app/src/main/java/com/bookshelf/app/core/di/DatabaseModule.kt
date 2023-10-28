@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.bookshelf.app.core.database.AppDatabase
 import com.bookshelf.app.dashboard.data.tables.dao.BooksDao
+import com.bookshelf.app.dashboard.data.tables.dao.BooksMetaDataDao
 import com.bookshelf.app.registration.data.tables.dao.CountryDao
 import com.bookshelf.app.registration.data.tables.dao.SessionDao
 import com.bookshelf.app.registration.data.tables.dao.UserCredsDao
@@ -78,5 +79,10 @@ object DatabaseModule {
     @Provides
     fun provideBooksDao(database: AppDatabase): BooksDao {
         return database.booksDataDao()
+    }
+
+    @Provides
+    fun provideBookMetaDataDao(database: AppDatabase): BooksMetaDataDao {
+        return database.booksMetadataDao()
     }
 }

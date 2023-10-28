@@ -59,6 +59,18 @@
         app:layout_constraintBottom_toTopOf="@id/nav_bar"
         app:layout_constraintTop_toBottomOf="@+id/cl_container_top">
 
+        <TextView
+            android:id="@+id/tv_sort_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:text="@string/sort_by_year"
+            android:textColor="@color/grey"
+            android:textSize="12sp"
+            app:layout_constraintBottom_toBottomOf="@id/rv_year"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/rv_year" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_year"
             android:layout_width="0dp"
@@ -67,7 +79,7 @@
             android:padding="10dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_sort_year"
             app:layout_constraintTop_toTopOf="parent"
             tools:itemCount="10"
             tools:listitem="@layout/layout_year_item" />

@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.bookshelf.app.R
 import com.bookshelf.app.core.utils.clickWithDebounce
-import com.bookshelf.app.dashboard.data.models.BooksDataResponseItem
+import com.bookshelf.app.dashboard.data.tables.BookWithMetadata
 import com.bookshelf.app.dashboard.presentation.ui.BookInfoBottomSheetDialog
 import com.bookshelf.app.databinding.LayoutBookCardBinding
 
@@ -19,12 +19,13 @@ import com.bookshelf.app.databinding.LayoutBookCardBinding
  * @property onFavouriteSelected A callback function that is invoked when the favorite icon for a book is clicked.
  */
 class BooksAdapter(
-    private val onItemSelected: (position: Int, book: BooksDataResponseItem) -> Unit,
-    private val onFavouriteSelected: (book: BooksDataResponseItem) -> Unit
+    private val onItemSelected: (position: Int, book: BookWithMetadata?) -> Unit,
+    private val onFavouriteSelected: (book: BookWithMetadata?) -> Unit,
+    private val onSaveTags: (bookData: BookWithMetadata) -> Unit
 ) :
     RecyclerView.Adapter<BooksAdapter.BooksViewHolder>() {
     // Private properties
-    private var bookList: MutableList<BooksDataResponseItem>? = null
+    private var bookList: MutableList<BookWithMetadata>? = null
     private var fragmentManager: FragmentManager? = null
     private var position = -1
     private var favouriteTabActive = false
@@ -38,7 +39,8 @@ class BooksAdapter(
             parent.context,
             fragmentManager,
             onItemSelected,
-            onFavouriteSelected
+            onFavouriteSelected,
+            onSaveTags
         )
     }
 
@@ -46,9 +48,10 @@ class BooksAdapter(
         // Bind data to the `BooksViewHolder` based on the item position.
         this.position = holder.bindingAdapterPosition
         if (favouriteTabActive) {
-            bookList?.filter { it.isFavourite == 1 }?.toMutableList()?.get(position)?.let {
-                holder.bind(it, this)
-            }
+            bookList?.filter { it.metadata?.isFavourite == 1 }?.toMutableList()?.get(position)
+                ?.let {
+                    holder.bind(it, this)
+                }
         } else {
             bookList?.get(position)?.let {
                 holder.bind(it, this)
@@ -59,7 +62,7 @@ class BooksAdapter(
     override fun getItemCount(): Int {
         // Return the number of items to be displayed in the RecyclerView.
         if (favouriteTabActive) {
-            bookList?.filter { it.isFavourite == 1 }?.toMutableList().let {
+            bookList?.filter { it.metadata?.isFavourite == 1 }?.toMutableList().let {
                 return it?.size ?: 0
             }
         } else {
@@ -74,27 +77,28 @@ class BooksAdapter(
         private val binding: LayoutBookCardBinding,
         private val context: Context,
         private val fragmentManager: FragmentManager?,
-        private val onItemSelected: (position: Int, book: BooksDataResponseItem) -> Unit,
-        private val onFavouriteSelected: (book: BooksDataResponseItem) -> Unit
+        private val onItemSelected: (position: Int, book: BookWithMetadata?) -> Unit,
+        private val onFavouriteSelected: (book: BookWithMetadata?) -> Unit,
+        private val onSaveTags: (bookData: BookWithMetadata) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(book: BooksDataResponseItem, booksAdapter: BooksAdapter) {
+        fun bind(book: BookWithMetadata, booksAdapter: BooksAdapter) {
             book.run {
                 // Bind book data to views within the `BooksViewHolder`.
-                if (isFavourite == 1) {
+                if (book.metadata?.isFavourite == 1) {
                     binding.ivFav.setColorFilter(context.getColor(R.color.golden))
                 } else {
                     binding.ivFav.setColorFilter(context.getColor(R.color.grey))
                 }
-                this.image?.let {
+                this.book?.image?.let {
                     binding.ivBook.load(it)
                 }
-                this.score?.let {
+                this.book?.score?.let {
                     binding.tvBookRating.text = it.toString()
                 }
-                this.title?.let {
+                this.book?.title?.let {
                     binding.tvBookTitle.text = it
                 }
-                this.publishedChapterDate?.let {
+                this.book?.publishedChapterDate?.let {
                     binding.tvBookPublishYear.text =
                         context.getString(R.string.published_in_s, it.toString())
                 }
@@ -104,9 +108,12 @@ class BooksAdapter(
             binding.tvBookTitle.clickWithDebounce {
                 fragmentManager?.let {
                     // Show a bottom sheet dialog when the book title is clicked.
-                    BookInfoBottomSheetDialog().show(it, book) { bookData ->
-                        onFavouriteSelected.invoke(book)
-                    }
+                    BookInfoBottomSheetDialog().show(it, book,
+                        saveTags = {
+                            onSaveTags.invoke(it)
+                        }, clickedFavourite = {
+                            onFavouriteSelected.invoke(it)
+                        })
                 }
 
                 onItemSelected.invoke(bindingAdapterPosition, book)
@@ -119,13 +126,14 @@ class BooksAdapter(
         }
     }
 
-    private fun markOrUnmark(book: BooksDataResponseItem) {
+    private fun markOrUnmark(book: BookWithMetadata) {
         // Handle marking or unmarking a book as a favorite.
-        val currentPosition = bookList?.indexOf(book) ?: -1
+        val currentPosition = bookList?.indexOf(book) ?: 0
         if (currentPosition != -1) {
             val currentBook = bookList?.get(currentPosition)
-            currentBook?.isFavourite = if (currentBook?.isFavourite == 1) 0 else 1
-            if (currentBook?.isFavourite == 0 && favouriteTabActive) {
+            currentBook?.metadata?.isFavourite =
+                if (currentBook?.metadata?.isFavourite == 1) 0 else 1
+            if (currentBook?.metadata?.isFavourite == 0 && favouriteTabActive) {
                 bookList?.removeAt(currentPosition)
                 notifyItemRemoved(currentPosition)
             } else {
@@ -152,7 +160,7 @@ class BooksAdapter(
     /**
      * Set the data for the adapter to display.
      */
-    fun setData(dataList: MutableList<BooksDataResponseItem>) {
+    fun setData(dataList: MutableList<BookWithMetadata>) {
         this.bookList = dataList
         notifyDataSetChanged()
     }
